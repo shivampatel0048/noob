@@ -69,7 +69,7 @@ const Navbar = () => {
     ];
 
     React.useEffect(() => {
-        const storedUser = localStorage.getItem("user");
+        const storedUser = window.localStorage.getItem("user");
         if (storedUser) {
             setUser1(JSON.parse(storedUser));
         }

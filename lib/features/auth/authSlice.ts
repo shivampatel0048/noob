@@ -16,7 +16,7 @@ interface AuthState {
 }
 
 const loadUserFromLocalStorage = () => {
-  const storedUser = localStorage.getItem("user");
+  const storedUser = window.localStorage.getItem("user");
   return storedUser ? JSON.parse(storedUser) : null;
 };
 
@@ -81,7 +81,7 @@ const authSlice = createSlice({
       state.loggedInUser = null;
       state.email = null;
       state.otp = null;
-      localStorage.removeItem("user"); // Clear user data from localStorage
+      window.localStorage.removeItem("user"); // Clear user data from localStorage
     },
     setUserFromLocalStorage: (state) => {
       state.loggedInUser = loadUserFromLocalStorage();
@@ -97,7 +97,7 @@ const authSlice = createSlice({
         (state, action: PayloadAction<User>) => {
           state.status = "idle";
           state.loggedInUser = action.payload;
-          localStorage.setItem("user", JSON.stringify(action.payload)); // Store user data in localStorage
+          window.localStorage.setItem("user", JSON.stringify(action.payload)); // Store user data in localStorage
         }
       )
       .addCase(createUserAsync.rejected, (state, action) => {
@@ -113,7 +113,7 @@ const authSlice = createSlice({
           state.status = "idle";
           state.loggedInUser = action.payload;
           console.log("User data stored in localStorage:", action.payload);
-          localStorage.setItem("user", JSON.stringify(action.payload)); // Store user data in localStorage
+          window.localStorage.setItem("user", JSON.stringify(action.payload)); // Store user data in localStorage
         }
       )
       .addCase(checkUserAsync.rejected, (state, action) => {
