@@ -1,5 +1,3 @@
-"use client"
-
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   checkUser,
@@ -18,8 +16,11 @@ interface AuthState {
 }
 
 const loadUserFromLocalStorage = () => {
-  const storedUser = window.localStorage.getItem("user");
-  return storedUser ? JSON.parse(storedUser) : null;
+  if (typeof window !== "undefined") {
+    const storedUser = window.localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  }
+  return null;
 };
 
 const initialState: AuthState = {
@@ -32,7 +33,12 @@ const initialState: AuthState = {
 
 export const createUserAsync = createAsyncThunk(
   "auth/createUser",
-  async (userData: {role:string, email:string, name:string, password:string}) => {
+  async (userData: {
+    role: string;
+    email: string;
+    name: string;
+    password: string;
+  }) => {
     const response = await createUser(userData);
     return response.data;
   }
@@ -56,8 +62,8 @@ export const checkUserAsync = createAsyncThunk(
 
 export const resetPasswordAsync = createAsyncThunk(
   "auth/resetPassword",
-  async (userData: { email:string, otp:string, newPassword:string }) => {
-    const response = await resetPassword(userData );
+  async (userData: { email: string; otp: string; newPassword: string }) => {
+    const response = await resetPassword(userData);
     return response.data;
   }
 );
@@ -83,7 +89,9 @@ const authSlice = createSlice({
       state.loggedInUser = null;
       state.email = null;
       state.otp = null;
-      window.localStorage.removeItem("user"); // Clear user data from localStorage
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem("user");
+      }
     },
     setUserFromLocalStorage: (state) => {
       state.loggedInUser = loadUserFromLocalStorage();
@@ -99,7 +107,9 @@ const authSlice = createSlice({
         (state, action: PayloadAction<User>) => {
           state.status = "idle";
           state.loggedInUser = action.payload;
-          window.localStorage.setItem("user", JSON.stringify(action.payload)); // Store user data in localStorage
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem("user", JSON.stringify(action.payload));
+          }
         }
       )
       .addCase(createUserAsync.rejected, (state, action) => {
@@ -115,7 +125,9 @@ const authSlice = createSlice({
           state.status = "idle";
           state.loggedInUser = action.payload;
           console.log("User data stored in localStorage:", action.payload);
-          window.localStorage.setItem("user", JSON.stringify(action.payload)); // Store user data in localStorage
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem("user", JSON.stringify(action.payload));
+          }
         }
       )
       .addCase(checkUserAsync.rejected, (state, action) => {
